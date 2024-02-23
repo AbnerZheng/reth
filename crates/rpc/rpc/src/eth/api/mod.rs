@@ -12,7 +12,6 @@ use crate::eth::{
     signer::EthSigner,
 };
 
-use async_trait::async_trait;
 use reth_interfaces::RethResult;
 use reth_network_api::NetworkInfo;
 use reth_node_api::ConfigureEvmEnv;
@@ -56,10 +55,9 @@ pub use transactions::{EthTransactions, TransactionSource};
 /// `Eth` API trait.
 ///
 /// Defines core functionality of the `eth` API implementation.
-#[async_trait]
 pub trait EthApiSpec: EthTransactions + Send + Sync {
     /// Returns the current ethereum protocol version.
-    async fn protocol_version(&self) -> RethResult<U64>;
+    fn protocol_version(&self) -> impl Future<Output=RethResult<U64>>+Send;
 
     /// Returns the chain id
     fn chain_id(&self) -> U64;
@@ -379,7 +377,6 @@ impl<Provider, Pool, Events, EvmConfig> Clone for EthApi<Provider, Pool, Events,
     }
 }
 
-#[async_trait]
 impl<Provider, Pool, Network, EvmConfig> EthApiSpec for EthApi<Provider, Pool, Network, EvmConfig>
 where
     Pool: TransactionPool + Clone + 'static,
