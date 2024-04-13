@@ -14,9 +14,13 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const prBody = context.payload.pull_request.body;
+            console.log(prBody);
+            console.log(context.payload.repository);
             const repo = context.repo;
+            
+            const pattern = `(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) ${} #(\d+)/i`
 
-            const issueNumberMatch = prBody.match(/(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #(\d+)/i);
+            const issueNumberMatch = prBody.match(/ #(\d+)/i);
             if (!issueNumberMatch) {
               console.log("No issue reference found in PR description.");
               return;
