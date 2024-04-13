@@ -14,19 +14,19 @@ jobs:
                   script: |
                       const prNumber = context.payload.pull_request.number;
                       const prBody = context.payload.pull_request.body;
-                      console.log(context.payload.pull_request);
-                      console.log(context.payload.repository);
-                      const repo = context.repo;
+                      const repo= context.repo;
+                      
+                      const repoUrl = context.payload.repository.html_url;
+                      const pattern = new RegExp(`(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) ${repoUrl}/issues/(?<issue_number>\\d+)`, 'i')
+                      
+                      const re = str.match(pattern);
+                      const issueNumber = re.groups?.issue_number;
 
-                      const pattern = `(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #(\d+)/i`
-
-                      const issueNumberMatch = prBody.match(new RegExp(pattern));
-                      if (!issueNumberMatch) {
+                      if (!issueNumber) {
                         console.log("No issue reference found in PR description.");
                         return;
                       }
 
-                      const issueNumber = issueNumberMatch[1];
                       const issue = await github.rest.issues.get({
                         ...repo,
                         issue_number: issueNumber,
