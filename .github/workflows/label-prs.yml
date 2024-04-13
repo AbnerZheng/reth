@@ -1,42 +1,42 @@
 name: Label PRs-4
 
 on:
-  pull_request:
-    types: [opened]
+    pull_request:
+        types: [opened]
 
 jobs:
-  label_prs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Label PRs
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            const prBody = context.payload.pull_request.body;
-            console.log(prBody);
-            console.log(context.payload.repository);
-            const repo = context.repo;
-            
-            const pattern = `(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) ${} #(\d+)/i`
+    label_prs:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Label PRs
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const prNumber = context.payload.pull_request.number;
+                      const prBody = context.payload.pull_request.body;
+                      console.log(prBody);
+                      console.log(context.payload.repository);
+                      const repo = context.repo;
 
-            const issueNumberMatch = prBody.match(/ #(\d+)/i);
-            if (!issueNumberMatch) {
-              console.log("No issue reference found in PR description.");
-              return;
-            }
+                      const pattern = `(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #(\d+)/i`
 
-            const issueNumber = issueNumberMatch[1];
-            const issue = await github.rest.issues.get({
-              ...repo,
-              issue_number: issueNumber,
-            });
+                      const issueNumberMatch = prBody.match(new RegExp(pattern));
+                      if (!issueNumberMatch) {
+                        console.log("No issue reference found in PR description.");
+                        return;
+                      }
 
-            const issueLabels = issue.data.labels.map(label => label.name);
-            if (issueLabels.length > 0) {
-              await github.rest.issues.setLabels({
-                ...repo,
-                issue_number: prNumber,
-                labels: issueLabels,
-              });
-            }
+                      const issueNumber = issueNumberMatch[1];
+                      const issue = await github.rest.issues.get({
+                        ...repo,
+                        issue_number: issueNumber,
+                      });
+
+                      const issueLabels = issue.data.labels.map(label => label.name);
+                      if (issueLabels.length > 0) {
+                        await github.rest.issues.setLabels({
+                          ...repo,
+                          issue_number: prNumber,
+                          labels: issueLabels,
+                        });
+                      }
