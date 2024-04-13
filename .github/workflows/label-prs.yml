@@ -19,7 +19,7 @@ jobs:
                       const repoUrl = context.payload.repository.html_url;
                       const pattern = new RegExp(`(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) ${repoUrl}/issues/(?<issue_number>\\d+)`, 'i')
                       
-                      const re = str.match(pattern);
+                      const re = prBody.match(pattern);
                       const issueNumber = re.groups?.issue_number;
 
                       if (!issueNumber) {
